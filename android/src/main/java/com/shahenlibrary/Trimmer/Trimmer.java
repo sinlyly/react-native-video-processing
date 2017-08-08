@@ -77,14 +77,14 @@ public class Trimmer {
     }
 
     WritableArray images = Arguments.createArray();
-    int duration = Integer.parseInt(retriever.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION));
+    int duration = Integer.parseInt(retriever.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION)) / 1000;
     int width = Integer.parseInt(retriever.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
     int height = Integer.parseInt(retriever.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
     int orientation = Integer.parseInt(retriever.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION));
 
     float aspectRatio = width / height;
 
-    int resizeWidth = 200;
+    int resizeWidth = 100;
     int resizeHeight = Math.round(resizeWidth / aspectRatio);
 
     float scaleWidth = ((float) resizeWidth) / width;
@@ -105,8 +105,7 @@ public class Trimmer {
     mx.postRotate(orientation - 360);
 
     for (int i = 0; i < duration; i ++) {
-      Bitmap frame = retriever.getFrameAtTime(i * 1000);
-
+      Bitmap frame = retriever.getFrameAtTime(i * 1000 * 1000);
       if(frame == null) {
         continue;
       }
@@ -114,7 +113,7 @@ public class Trimmer {
 
       Bitmap normalizedBmp = Bitmap.createBitmap(currBmp, 0, 0, resizeWidth, resizeHeight, mx, true);
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-      normalizedBmp.compress(Bitmap.CompressFormat.PNG, 90, byteArrayOutputStream);
+      normalizedBmp.compress(Bitmap.CompressFormat.PNG, 50, byteArrayOutputStream);
       byte[] byteArray = byteArrayOutputStream .toByteArray();
       String encoded = "data:image/png;base64," + Base64.encodeToString(byteArray, Base64.DEFAULT);
       images.pushString(encoded);
@@ -138,7 +137,7 @@ public class Trimmer {
       mmr.setDataSource(path);
     }
 
-    int duration = Integer.parseInt(mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION)) / 1000;
+    int duration = Integer.parseInt(mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION));
     int width = Integer.parseInt(mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
     int height = Integer.parseInt(mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
     int orientation = Integer.parseInt(mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION));
