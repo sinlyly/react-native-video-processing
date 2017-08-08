@@ -1,4 +1,8 @@
-<manifest
-    package="com.shahenlibrary">
+<manifest xmlns:tools="http://schemas.android.com/tools"
+    package="com.shahenlibrary" >
+
+    <uses-sdk
+        tools:overrideLibrary="com.github.hiteshsondhi88.libffmpeg"
+        />
 </manifest>
   
