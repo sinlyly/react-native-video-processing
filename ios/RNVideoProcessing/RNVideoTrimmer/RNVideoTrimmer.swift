@@ -373,6 +373,29 @@ class RNVideoTrimmer: NSObject {
     }
     callback( [NSNull(), assetInfo] )
   }
+  
+  //update by sin
+  @objc func getVideoInfo(_ source: String,  resolve:@escaping  RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    let sourceURL = getSourceURL(source: source)
+    let asset = AVAsset(url: sourceURL)
+    var assetInfo: [String: Any] = [
+      "duration" : asset.duration.seconds
+    ]
+    if let track = asset.tracks(withMediaType: AVMediaTypeVideo).first {
+      let naturalSize = track.naturalSize
+      let t = track.preferredTransform
+      let isPortrait = t.a == 0 && abs(t.b) == 1 && t.d == 0
+      let size = [
+        "width": isPortrait ? naturalSize.height : naturalSize.width,
+        "height": isPortrait ? naturalSize.width : naturalSize.height
+      ]
+      assetInfo["size"] = size
+    }
+    resolve(assetInfo)
+  }
+  
+  
+  
 
   @objc func getPreviewImageAtPosition(_ source: String, atTime: Float = 0, maximumSize: NSDictionary, format: String = "base64", callback: @escaping RCTResponseSenderBlock) {
     let sourceURL = getSourceURL(source: source)
@@ -426,6 +449,36 @@ class RNVideoTrimmer: NSObject {
       callback( ["Failed to convert base64: \(error.localizedDescription)", NSNull()] )
     }
   }
+  
+  //update by sin
+  @objc func getPreviewImages(_ source: String, resolve:@escaping  RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    var images = [String]()
+    let sourceURL = getSourceURL(source: source)
+    let asset = AVAsset(url: sourceURL)
+   
+    let imageGenerator = AVAssetImageGenerator(asset: asset)
+    imageGenerator.maximumSize = CGSize(width: 200, height: 200)
+    imageGenerator.appliesPreferredTrackTransform = true
+    for index in 1 ..< Int(asset.duration.seconds) {
+      let timestamp = CMTime(seconds: Double(index), preferredTimescale: 1)
+      do {
+          let imageRef = try imageGenerator.copyCGImage(at: timestamp, actualTime: nil)
+          let image = UIImage(cgImage: imageRef)
+          let imgData = UIImagePNGRepresentation(image)
+          let base64string = imgData?.base64EncodedString(options: Data.Base64EncodingOptions.init(rawValue: 0))
+          if base64string != nil {
+            images.append("data:image/png;base64," + base64string!)
+          }
+      } catch {
+        //callback( ["Failed to convert base64: \(error.localizedDescription)", NSNull()] )
+      }
+    }
+   // resolve(images);
+    resolve(["images" : images]);
+    
+  }
+  
+  
 
   func randomString() -> String {
     let letters: NSString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
