@@ -104,7 +104,7 @@ public class Trimmer {
     mx.postScale(scaleWidth, scaleHeight);
     mx.postRotate(orientation - 360);
 
-    for (int i = 0; i < duration; i += duration / 10) {
+    for (int i = 0; i < duration; i ++) {
       Bitmap frame = retriever.getFrameAtTime(i * 1000);
 
       if(frame == null) {
@@ -138,7 +138,7 @@ public class Trimmer {
       mmr.setDataSource(path);
     }
 
-    int duration = Integer.parseInt(mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION));
+    int duration = Integer.parseInt(mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION)) / 1000;
     int width = Integer.parseInt(mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
     int height = Integer.parseInt(mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
     int orientation = Integer.parseInt(mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION));
