@@ -23,7 +23,6 @@
  */
 package com.shahenlibrary.Trimmer;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.facebook.react.bridge.Promise;
